@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from sys import exit
+from sys import argv, exit
 from typing import List, Dict
 
 
@@ -30,7 +30,11 @@ def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
 
 
 def parse_config() -> Dict:
-    file: str = "config.txt"
+    try:
+        file: str = argv[1]
+    except IndexError:
+        print(f"Usage: python3 {argv[0]} <config file>")
+        exit()
     config_list: List = []
     try:
         with open(file) as f:
@@ -60,13 +64,28 @@ def parse_config() -> Dict:
     return config_dict
 
 
-# def validate_config(config_dict: Dict) -> bool:
-#     if ()
+def validate_config(config_dict: Dict) -> bool:
+    if config_dict["WIDTH"] < 1 or config_dict["HEIGHT"] < 1:
+        return False
+    if (config_dict["ENTRY"][0] >= config_dict["WIDTH"]
+            or config_dict["ENTRY"][0] < 0
+            or config_dict["ENTRY"][1] >= config_dict["HEIGHT"]
+            or config_dict["ENTRY"][1] < 0):
+        return False
+    if (config_dict["EXIT"][0] >= config_dict["WIDTH"]
+            or config_dict["EXIT"][0] < 0
+            or config_dict["EXIT"][1] >= config_dict["HEIGHT"]
+            or config_dict["EXIT"][1] < 0):
+        return False
+    if config_dict["ENTRY"] == config_dict["EXIT"]:
+        return False
+    if not config_dict["OUTPUT_FILE"]:
+        return False
+    return True
 
 
 def main() -> None:
     config_dict: Dict = parse_config()
-    print(config_dict)
 
 
 if __name__ == "__main__":
