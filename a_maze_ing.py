@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
 from sys import exit
-from typing import List, Dict, Callable
+from typing import List, Dict
+
 
 def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
     try:
-        if conversion == "int":
+        if conversion == "str":
+            config_dict[key]
+        elif conversion == "int":
             config_dict[key] = int(config_dict[key])
         elif conversion == "tuple":
             temp: List = config_dict[key].split(",")
@@ -18,8 +21,11 @@ def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
                 config_dict[key] = False
             else:
                 raise Exception("Invalid string for bool!")
+    except KeyError:
+        print(f"Error while parsing {key}: missing argument")
+        exit()
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error while parsing {key}: {e}")
         exit()
 
 
@@ -48,12 +54,19 @@ def parse_config() -> Dict:
     parse_value(config_dict, "HEIGHT", "int")
     parse_value(config_dict, "ENTRY", "tuple")
     parse_value(config_dict, "EXIT", "tuple")
+    parse_value(config_dict, "OUTPUT_FILE", "str")
     parse_value(config_dict, "PERFECT", "bool")
+    parse_value(config_dict, "SEED", "str")
     return config_dict
+
+
+# def validate_config(config_dict: Dict) -> bool:
+#     if ()
 
 
 def main() -> None:
     config_dict: Dict = parse_config()
+    print(config_dict)
 
 
 if __name__ == "__main__":
