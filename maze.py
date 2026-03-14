@@ -9,8 +9,15 @@ TWO: List[tuple] = [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (1, 2), (0, 2),
 class MazeGenerator:
     """Geneates a maze using the backtracker algorithm."""
 
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, pattern: bool = False) -> None:
         """Initialize the MazeGenerator with a given width and height.
+        
+        Args:
+            width: The width of the maze in cells.
+            height: The height of the maze in cells.
+            pattern: Whether to place the 42 pattern. Defaults to False.
+
+        Attributes:    
             grid: 2D list of integers representing the maze cells.
                   0 = normal cell, -1 = blocked cell.
         """
@@ -23,6 +30,8 @@ class MazeGenerator:
             for x in range(width):
                 row.append(0)
             self.grid.append(row)
+        if pattern:
+            self.place_pattern()
 
     def place_pattern(self) -> None:
         """Place the 42 pattern and set these cells as BLOCKED (-1)."""
