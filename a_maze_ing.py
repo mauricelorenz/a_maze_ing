@@ -85,9 +85,39 @@ def validate_config(config_dict: Dict) -> bool:
     return True
 
 
+def test_output(maze: MazeGenerator, hex: bool) -> None:
+    for row in maze.grid:
+        for col in row:
+            if hex:
+                print(f"{col:x}", end="")
+            elif (col == -1):
+                print("#", end="")
+            else:
+                print("_", end="")
+        print()
+
+
+def create_output_file(maze: MazeGenerator, config_dict: Dict) -> None:
+    output_string = ""
+    for row in maze.grid:
+        for col in row:
+            output_string += f"{col:x}"
+        output_string += "\n"
+    output_string += f"\n{config_dict['ENTRY'][0]},{config_dict['ENTRY'][1]}\n"
+    output_string += f"{config_dict['EXIT'][0]},{config_dict['EXIT'][1]}\n"
+    output_string += "[SOLUTION PATH HERE]\n"
+    try:
+        with open(config_dict["OUTPUT_FILE"], "w") as f:
+            f.write(output_string)
+    except Exception as e:
+        print(f"Error while creating {config_dict['OUTPUT_FILE']}: {e}")
+
+
 def main() -> None:
     config_dict: Dict = parse_config()
-    maze = MazeGenerator(config_dict["WIDTH"], config_dict["HEIGHT"])
+    maze = MazeGenerator(config_dict["WIDTH"], config_dict["HEIGHT"], True)
+    # test_output(maze, True)
+    create_output_file(maze, config_dict)
 
 
 if __name__ == "__main__":
