@@ -13,6 +13,8 @@ def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
             config_dict[key] = int(config_dict[key])
         elif conversion == "tuple":
             temp: List = config_dict[key].split(",")
+            if len(temp) != 2:
+                raise ValueError("Tuple must have 2 values!")
             temp_int: List = [int(nbr) for nbr in temp]
             config_dict[key] = tuple(temp_int)
         elif conversion == "bool":
