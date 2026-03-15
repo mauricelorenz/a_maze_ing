@@ -3,11 +3,12 @@
 """a_maze_ing main program to be run directly."""
 
 from sys import argv, exit
-from typing import List, Dict
+from typing import List, Dict, Any
 from maze import MazeGenerator
 
 
-def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
+def parse_value(config_dict: Dict[str, Any],
+                key: str, conversion: str) -> None:
     """Turn the dict values from string into destination type.
 
     Args:
@@ -21,10 +22,10 @@ def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
         elif conversion == "int":
             config_dict[key] = int(config_dict[key])
         elif conversion == "tuple":
-            temp: List = config_dict[key].split(",")
+            temp: List[str] = config_dict[key].split(",")
             if len(temp) != 2:
                 raise ValueError("Tuple must have 2 values!")
-            temp_int: List = [int(nbr) for nbr in temp]
+            temp_int: List[int] = [int(nbr) for nbr in temp]
             config_dict[key] = tuple(temp_int)
         elif conversion == "bool":
             if config_dict[key] == "True":
@@ -41,7 +42,7 @@ def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
         exit()
 
 
-def parse_config(file: str) -> Dict:
+def parse_config(file: str) -> Dict[str, Any]:
     """Read and parse configuration file.
 
     Args:
@@ -50,7 +51,7 @@ def parse_config(file: str) -> Dict:
     Returns:
         Dict containing parsed config values.
     """
-    config_list: List = []
+    config_list: List[str] = []
     try:
         with open(file) as f:
             for line in f:
@@ -59,10 +60,10 @@ def parse_config(file: str) -> Dict:
     except FileNotFoundError:
         print(f"File {file} not found. Please make sure it exists!")
         exit()
-    config_dict: Dict = {}
+    config_dict: Dict[str, Any] = {}
     try:
         for item in config_list:
-            split_item: List = item.split("=")
+            split_item: List[str] = item.split("=")
             if len(split_item) != 2:
                 raise Exception("Invalid key value pairs!")
             config_dict[split_item[0]] = split_item[1]
@@ -78,7 +79,7 @@ def parse_config(file: str) -> Dict:
     return config_dict
 
 
-def validate_config(config_dict: Dict) -> bool:
+def validate_config(config_dict: Dict[str, Any]) -> bool:
     """Check config_dict for invalid values.
 
     Args:
@@ -112,7 +113,7 @@ def test_output(maze: MazeGenerator, hex: bool) -> None:
     for row in maze.grid:
         for col in row:
             if hex:
-                print(f"{col:x}", end="")
+                print(f"{col:X}", end="")
             elif (col == -1):
                 print("#", end="")
             else:
@@ -120,7 +121,8 @@ def test_output(maze: MazeGenerator, hex: bool) -> None:
         print()
 
 
-def create_output_file(maze: MazeGenerator, config_dict: Dict) -> None:
+def create_output_file(maze: MazeGenerator,
+                       config_dict: Dict[str, Any]) -> None:
     """Create the predefined output file from the created maze.
 
     Args:
@@ -130,7 +132,7 @@ def create_output_file(maze: MazeGenerator, config_dict: Dict) -> None:
     output_string = ""
     for row in maze.grid:
         for col in row:
-            output_string += f"{col:x}"
+            output_string += f"{col:X}"
         output_string += "\n"
     output_string += f"\n{config_dict['ENTRY'][0]},{config_dict['ENTRY'][1]}\n"
     output_string += f"{config_dict['EXIT'][0]},{config_dict['EXIT'][1]}\n"
@@ -149,10 +151,11 @@ def main() -> None:
     except IndexError:
         print(f"Usage: python3 {argv[0]} <config file>")
         exit()
-    config_dict: Dict = parse_config(file)
-    print(config_dict)
+    config_dict: Dict[str, Any] = parse_config(file)
+    # print(config_dict)
     maze = MazeGenerator(config_dict["WIDTH"], config_dict["HEIGHT"], True)
-    # test_output(maze, True)
+    maze.generate_maze(config_dict)
+    test_output(maze, True)
     create_output_file(maze, config_dict)
 
 
