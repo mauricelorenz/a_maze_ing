@@ -32,12 +32,7 @@ def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
         exit()
 
 
-def parse_config() -> Dict:
-    try:
-        file: str = argv[1]
-    except IndexError:
-        print(f"Usage: python3 {argv[0]} <config file>")
-        exit()
+def parse_config(file: str) -> Dict:
     config_list: List = []
     try:
         with open(file) as f:
@@ -63,7 +58,6 @@ def parse_config() -> Dict:
     parse_value(config_dict, "EXIT", "tuple")
     parse_value(config_dict, "OUTPUT_FILE", "str")
     parse_value(config_dict, "PERFECT", "bool")
-    parse_value(config_dict, "SEED", "str")
     return config_dict
 
 
@@ -116,7 +110,13 @@ def create_output_file(maze: MazeGenerator, config_dict: Dict) -> None:
 
 
 def main() -> None:
-    config_dict: Dict = parse_config()
+    try:
+        file: str = argv[1]
+    except IndexError:
+        print(f"Usage: python3 {argv[0]} <config file>")
+        exit()
+    config_dict: Dict = parse_config(file)
+    print(config_dict)
     maze = MazeGenerator(config_dict["WIDTH"], config_dict["HEIGHT"], True)
     # test_output(maze, True)
     create_output_file(maze, config_dict)
