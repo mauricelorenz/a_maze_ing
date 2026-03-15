@@ -1,3 +1,5 @@
+"""a_maze_ing module for maze generation."""
+
 from typing import List
 
 BLOCKED = -1
@@ -21,7 +23,6 @@ class MazeGenerator:
             grid: 2D list of integers representing the maze cells.
                   0 = normal cell, -1 = blocked cell.
         """
-
         self.width: int = width
         self.height: int = height
         self.grid: List[List[int]] = []
@@ -35,7 +36,6 @@ class MazeGenerator:
 
     def place_pattern(self) -> None:
         """Place the 42 pattern and set these cells as BLOCKED (-1)."""
-
         if self.width < 11 or self.height < 9:
             print("Maze too small to place 42 pattern!")
             return

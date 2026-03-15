@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 
+"""a_maze_ing main program to be run directly."""
+
 from sys import argv, exit
 from typing import List, Dict
 from maze import MazeGenerator
 
 
 def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
+    """Turn the dict values from string into destination type.
+
+    Args:
+        config_dict: Dict containing parsed config values.
+        key: Key for the value to be cast.
+        conversion: Desired type for the value.
+    """
     try:
         if conversion == "str":
             config_dict[key]
@@ -33,6 +42,14 @@ def parse_value(config_dict: Dict, key: str, conversion: str) -> None:
 
 
 def parse_config(file: str) -> Dict:
+    """Read and parse configuration file.
+
+    Args:
+        file: A file containing key value pairs.
+
+    Returns:
+        Dict containing parsed config values.
+    """
     config_list: List = []
     try:
         with open(file) as f:
@@ -62,6 +79,14 @@ def parse_config(file: str) -> Dict:
 
 
 def validate_config(config_dict: Dict) -> bool:
+    """Check config_dict for invalid values.
+
+    Args:
+        config_dict: Dict containing parsed config values.
+
+    Returns:
+        True if all parameters are valid, else False.
+    """
     if config_dict["WIDTH"] < 1 or config_dict["HEIGHT"] < 1:
         return False
     if (config_dict["ENTRY"][0] >= config_dict["WIDTH"]
@@ -81,7 +106,9 @@ def validate_config(config_dict: Dict) -> bool:
     return True
 
 
+# Only for development. Remove before turning in
 def test_output(maze: MazeGenerator, hex: bool) -> None:
+    """Output test function."""
     for row in maze.grid:
         for col in row:
             if hex:
@@ -94,6 +121,12 @@ def test_output(maze: MazeGenerator, hex: bool) -> None:
 
 
 def create_output_file(maze: MazeGenerator, config_dict: Dict) -> None:
+    """Create the predefined output file from the created maze.
+
+    Args:
+        maze: Maze instance containing grid, entry, exit, and solution.
+        config_dict: Dict containing parsed config values.
+    """
     output_string = ""
     for row in maze.grid:
         for col in row:
@@ -110,6 +143,7 @@ def create_output_file(maze: MazeGenerator, config_dict: Dict) -> None:
 
 
 def main() -> None:
+    """Run the main program."""
     try:
         file: str = argv[1]
     except IndexError:
