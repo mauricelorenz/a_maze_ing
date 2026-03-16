@@ -1,6 +1,6 @@
 """a_maze_ing module for maze generation."""
 
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Any
 from random import seed, shuffle, randint
 
 BLOCKED = -1
@@ -14,31 +14,39 @@ TWO: List[tuple[int, int]] = [(0, 0), (1, 0), (2, 0), (2, 1),
 class MazeGenerator:
     """Generates a maze using the backtracker algorithm."""
 
-    def __init__(self, width: int, height: int, pattern: bool = False) -> None:
+    def __init__(self, config_dict: Dict[str, Any]) -> None:
         """Initialize the MazeGenerator with a given width and height.
 
         Args:
-            width: The width of the maze in cells.
-            height: The height of the maze in cells.
-            pattern: Whether to place the 42 pattern. Defaults to False.
+            config_dict: Dict containing parsed config values.
+                         Required keys: WIDTH, HEIGHT.
+                         Optional keys: PATTERN (bool, defaults to False).
 
         Attributes:
             grid: 2D list of integers representing the maze cells.
-                  0 = normal cell, -1 = blocked cell.
+                  15 = all walls closed, -1 = blocked cell (42 pattern).
+            config: Dict containing parsed config values.
         """
-        self.width: int = width
-        self.height: int = height
+        self.width = config_dict["WIDTH"]
+        self.height = config_dict["HEIGHT"]
+        self.config = config_dict
         self.grid: List[List[int]] = []
-        for y in range(height):
+        for y in range(self.height):
             row: List[int] = []
-            for x in range(width):
+            for x in range(self.width):
                 row.append(15)
             self.grid.append(row)
-        if pattern:
+        if (config_dict.get("PATTERN", False)
+                and self.width >= 11
+                and self.height >= 9):
             self.place_pattern()
 
     def place_pattern(self) -> None:
-        """Place the 42 pattern and set these cells as BLOCKED (-1)."""
+        """Place the 42 pattern and set these cells as BLOCKED (-1).
+
+        Prints an error and returns early if the maze is too small
+        (minimum 11x9 required.)
+        """
         if self.width < 11 or self.height < 9:
             print("Maze too small to place 42 pattern!")
             return
@@ -50,17 +58,17 @@ class MazeGenerator:
         for (px, py) in TWO:
             self.grid[start_y + py][start_x + px + 4] = BLOCKED
 
-    def generate_maze(self, config_dict: Dict[str, Any]) -> None:
+    def generate_maze(self) -> None:
         """Use backtracking to generate a maze in the grid.
 
         Args:
             config_dict: Dict containing parsed config values.
         """
-        entry: Tuple[int, int] = config_dict["ENTRY"]
-        if config_dict.get("SEED", None):
-            seed(config_dict["SEED"])
+        entry = self.config["ENTRY"]
+        if self.config.get("SEED", None):
+            seed(self.config["SEED"])
         self._backtrack(*entry)
-        if not config_dict["PERFECT"]:
+        if not self.config["PERFECT"]:
             self._remove_walls()
         for r, row in enumerate(self.grid):
             for c, col in enumerate(row):
@@ -98,15 +106,45 @@ class MazeGenerator:
         return True
 
     def _remove_walls(self) -> None:
-        """Remove additional walls to generate a non-perfect maze."""
+        """Removes approximately 10% of walls randomly to create loops.
+
+        Skips walls that would create a 3x3 open area. Stopfs after a maximum
+        number of tries to prevent an infinte loop.
+        """
         to_remove = int(self.width * self.height * 0.1)
-        while to_remove:
+        max_tries = int(self.width * self.height * 10)
+        tries: int = 0
+        while to_remove and tries < max_tries:
             x = randint(1, self.width - 2)
             y = randint(1, self.height - 2)
             dirs = [(0, -1, 1, 4), (0, 1, 4, 1), (-1, 0, 8, 2), (1, 0, 2, 8)]
             shuffle(dirs)
             if (self.grid[y][x] != -1
-                    and self.grid[y + dirs[0][1]][x + dirs[0][0]] != -1):
+                    and self.grid[y + dirs[0][1]][x + dirs[0][0]] != -1
+                    and not self._would_create_3x3(x, y)):
                 self.grid[y][x] &= ~dirs[0][2]
                 self.grid[y + dirs[0][1]][x + dirs[0][0]] &= ~dirs[0][3]
                 to_remove -= 1
+            tries += 1
+
+    def _would_create_3x3(self, x: int, y: int) -> bool:
+        """Check if removing a wall would create a 3x3 open area around (x, y).
+
+        Args:
+            x: x value of the center position.
+            y: y value of the center position.
+
+        Returns:
+            True if a 3x3 open area exists, else False.
+        """
+        for dy in range(-1, 2):
+            for dx in range(-1, 2):
+                nx = x + dx
+                ny = y + dy
+                if self._is_in_bounds(nx + 1, ny):
+                    if self.grid[ny][nx] & 2 != 0:
+                        return False
+                if self._is_in_bounds(nx, ny + 1):
+                    if self.grid[ny][nx] & 4 != 0:
+                        return False
+        return True

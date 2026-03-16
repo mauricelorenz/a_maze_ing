@@ -76,6 +76,7 @@ def parse_config(file: str) -> Dict[str, Any]:
     parse_value(config_dict, "EXIT", "tuple")
     parse_value(config_dict, "OUTPUT_FILE", "str")
     parse_value(config_dict, "PERFECT", "bool")
+    parse_value(config_dict, "PATTERN", "bool")
     return config_dict
 
 
@@ -153,8 +154,8 @@ def main() -> None:
         exit()
     config_dict: Dict[str, Any] = parse_config(file)
     # print(config_dict)
-    maze = MazeGenerator(config_dict["WIDTH"], config_dict["HEIGHT"], True)
-    maze.generate_maze(config_dict)
+    maze = MazeGenerator(config_dict)
+    maze.generate_maze()
     test_output(maze, True)
     create_output_file(maze, config_dict)
 
