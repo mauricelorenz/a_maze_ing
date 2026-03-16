@@ -5,6 +5,7 @@
 from sys import argv, exit
 from typing import List, Dict, Any
 from maze import MazeGenerator
+from render_maze import render_maze
 
 
 def parse_value(config_dict: Dict[str, Any],
@@ -160,6 +161,7 @@ def main() -> None:
     maze.generate_maze()
     path: List[str] = maze.solve()
     create_output_file(maze, config_dict, path)
+    render_maze(maze)
 
 
 if __name__ == "__main__":
