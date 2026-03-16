@@ -2,6 +2,7 @@
 
 from typing import List, Dict, Any
 from random import seed, shuffle, randint
+from collections import deque
 
 BLOCKED = -1
 FOUR: List[tuple[int, int]] = [(0, 0), (0, 1), (0, 2), (1, 2),
@@ -148,3 +149,40 @@ class MazeGenerator:
                     if self.grid[ny][nx] & 4 != 0:
                         return False
         return True
+
+    def solve(self) -> List[str]:
+        """Solve the maze using BFS and return the shortest path.
+
+        Returns:
+            List of directions as strings (N, E, S, W).
+        """
+        entry = self.config["ENTRY"]
+        exit_ = self.config["EXIT"]
+        queue: deque = deque()
+        queue.append(entry)
+        visited: set = {entry}
+        came_from: Dict = {}
+        while queue:
+            current = queue.popleft()
+            if current == exit_:
+                break
+            dirs = [(0, -1, 1, "N"), (0, 1, 4, "S"),
+                    (-1, 0, 8, "W"), (1, 0, 2, "E")]
+            for dir in dirs:
+                nx = current[0] + dir[0]
+                ny = current[1] + dir[1]
+                neighbor = (nx, ny)
+                if (self._is_in_bounds(nx, ny)
+                        and neighbor not in visited
+                        and self.grid[current[1]][current[0]] & dir[2] == 0):
+                    queue.append(neighbor)
+                    visited.add(neighbor)
+                    came_from[neighbor] = (current, dir[3])
+        path: List[str] = []
+        current = exit_
+        while current != entry:
+            previous, direction = came_from[current]
+            path.append(direction)
+            current = previous
+        path.reverse()
+        return path

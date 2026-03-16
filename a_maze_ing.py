@@ -123,12 +123,14 @@ def test_output(maze: MazeGenerator, hex: bool) -> None:
 
 
 def create_output_file(maze: MazeGenerator,
-                       config_dict: Dict[str, Any]) -> None:
+                       config_dict: Dict[str, Any],
+                       path: List[str]) -> None:
     """Create the predefined output file from the created maze.
 
     Args:
         maze: Maze instance containing grid, entry, exit, and solution.
         config_dict: Dict containing parsed config values.
+        path: List of directions as strings(N, E, S, W).
     """
     output_string = ""
     for row in maze.grid:
@@ -137,7 +139,7 @@ def create_output_file(maze: MazeGenerator,
         output_string += "\n"
     output_string += f"\n{config_dict['ENTRY'][0]},{config_dict['ENTRY'][1]}\n"
     output_string += f"{config_dict['EXIT'][0]},{config_dict['EXIT'][1]}\n"
-    output_string += "[SOLUTION PATH HERE]\n"
+    output_string += "".join(path) + "\n"
     try:
         with open(config_dict["OUTPUT_FILE"], "w") as f:
             f.write(output_string)
@@ -156,8 +158,8 @@ def main() -> None:
     # print(config_dict)
     maze = MazeGenerator(config_dict)
     maze.generate_maze()
-    test_output(maze, True)
-    create_output_file(maze, config_dict)
+    path: List[str] = maze.solve()
+    create_output_file(maze, config_dict, path)
 
 
 if __name__ == "__main__":
