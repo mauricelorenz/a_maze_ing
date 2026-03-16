@@ -1,6 +1,6 @@
 """a_maze_ing module for maze generation."""
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Deque, Tuple, Set
 from random import seed, shuffle, randint
 from collections import deque
 
@@ -32,6 +32,7 @@ class MazeGenerator:
         self.height = config_dict["HEIGHT"]
         self.config = config_dict
         self.grid: List[List[int]] = []
+        self.path: List[str] = []
         for y in range(self.height):
             row: List[int] = []
             for x in range(self.width):
@@ -158,10 +159,10 @@ class MazeGenerator:
         """
         entry = self.config["ENTRY"]
         exit_ = self.config["EXIT"]
-        queue: deque = deque()
+        queue: Deque[Tuple[int, int]] = deque()
         queue.append(entry)
-        visited: set = {entry}
-        came_from: Dict = {}
+        visited: Set[Tuple[int, int]] = {entry}
+        came_from: Dict[Tuple[int, int], Tuple[Tuple[int, int], str]] = {}
         while queue:
             current = queue.popleft()
             if current == exit_:
@@ -178,11 +179,10 @@ class MazeGenerator:
                     queue.append(neighbor)
                     visited.add(neighbor)
                     came_from[neighbor] = (current, dir[3])
-        path: List[str] = []
         current = exit_
         while current != entry:
             previous, direction = came_from[current]
-            path.append(direction)
+            self.path.append(direction)
             current = previous
-        path.reverse()
-        return path
+        self.path.reverse()
+        return self.path
