@@ -77,7 +77,8 @@ def parse_config(file: str) -> Dict[str, Any]:
     parse_value(config_dict, "EXIT", "tuple")
     parse_value(config_dict, "OUTPUT_FILE", "str")
     parse_value(config_dict, "PERFECT", "bool")
-    parse_value(config_dict, "PATTERN", "bool")
+    if "PATTERN" in config_dict:
+        parse_value(config_dict, "PATTERN", "bool")
     if not validate_config(config_dict):
         exit()
     return config_dict
