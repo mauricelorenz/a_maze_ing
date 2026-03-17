@@ -192,7 +192,7 @@ class MazeGenerator:
         return self.path
 
     def _force_second_path(self) -> None:
-        """Force a second path by opening an additional wall at entry or exit."""
+        """Force a second path by opening an additional wall at entry."""
         x, y = self.config["ENTRY"]
         dirs = [(0, -1, 1, 4), (0, 1, 4, 1), (-1, 0, 8, 2), (1, 0, 2, 8)]
         shuffle(dirs)

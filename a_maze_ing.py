@@ -9,6 +9,7 @@ from output import create_output_file
 from mazegen import MazeGenerator
 from render_maze import render_maze
 
+
 # Only for development. Remove before turning in
 def test_output(maze: MazeGenerator, hex: bool) -> None:
     """Output test function."""
