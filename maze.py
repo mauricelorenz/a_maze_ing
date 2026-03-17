@@ -69,6 +69,8 @@ class MazeGenerator:
         entry = self.config["ENTRY"]
         if self.config.get("SEED", None):
             seed(self.config["SEED"])
+        else:
+            seed()
         self._backtrack(*entry)
         if not self.config["PERFECT"]:
             self._remove_walls()
@@ -180,6 +182,7 @@ class MazeGenerator:
                     visited.add(neighbor)
                     came_from[neighbor] = (current, dir[3])
         current = exit_
+        self.path = []
         while current != entry:
             previous, direction = came_from[current]
             self.path.append(direction)
