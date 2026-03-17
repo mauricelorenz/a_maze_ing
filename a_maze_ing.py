@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """a_maze_ing main program to be run directly."""
 
 from sys import argv, exit
@@ -10,38 +8,29 @@ from mazegen import MazeGenerator
 from maze_renderer import render_maze
 
 
-# Only for development. Remove before turning in
-def test_output(maze: MazeGenerator, hex: bool) -> None:
-    """Output test function."""
-    for row in maze.grid:
-        for col in row:
-            if hex:
-                print(f"{col:X}", end="")
-            elif (col == -1):
-                print("#", end="")
-            else:
-                print("_", end="")
-        print()
+def main_loop(file: str) -> None:
+    """Loop through maze output and user input.
 
-
-def main_loop(maze: MazeGenerator, file: str) -> None:
-    choice = "0"
+    Args:
+        file: Name of the config file.
+    """
+    choice = "1"
     show_path = False
     wall_colors = ["\033[37m", "\033[36m", "\033[35m"]
-    while choice != "4":
-        print("\n=== A-Maze-ing ===")
-        print("1. Re-generate a new maze")
-        print("2. Show/Hide path from entry to exit")
-        print("3. Rotate maze colors")
-        print("4. Quit")
-        choice = input("Choice? (1-4): ")
-        print()
+    while True:
+        if choice == "0":
+            print("\n=== A-Maze-ing ===")
+            print("1. Re-generate a new maze")
+            print("2. Show/Hide path from entry to exit")
+            print("3. Rotate maze colors")
+            print("4. Quit")
+            choice = input("Choice? (1-4): ")
+            print()
         if choice not in ["1", "2", "3", "4"]:
             print("Invalid choice. Try again!")
-            choice = "0"
         elif choice == "1":
             config_dict: Dict[str, Any] = parse_config(file)
-            maze = MazeGenerator(config_dict)
+            maze: MazeGenerator = MazeGenerator(config_dict)
             maze.generate_maze()
             maze.solve()
             create_output_file(maze)
@@ -52,6 +41,9 @@ def main_loop(maze: MazeGenerator, file: str) -> None:
         elif choice == "3":
             wall_colors.append(wall_colors.pop(0))
             render_maze(maze, show_path, wall_colors[0])
+        elif choice == "4":
+            break
+        choice = "0"
 
 
 def main() -> None:
@@ -61,13 +53,7 @@ def main() -> None:
     except IndexError:
         print(f"Usage: python3 {argv[0]} <config file>")
         exit()
-    config_dict: Dict[str, Any] = parse_config(file)
-    maze = MazeGenerator(config_dict)
-    maze.generate_maze()
-    maze.solve()
-    create_output_file(maze)
-    render_maze(maze, False)
-    main_loop(maze, file)
+    main_loop(file)
 
 
 if __name__ == "__main__":
