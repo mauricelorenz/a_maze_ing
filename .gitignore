@@ -6,3 +6,5 @@ smoke_test.sh
 output_validator.py
 mlx*
 render_test.py
+dist/
+mazegen.egg-info/
