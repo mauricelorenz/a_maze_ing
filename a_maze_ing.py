@@ -78,6 +78,8 @@ def parse_config(file: str) -> Dict[str, Any]:
     parse_value(config_dict, "OUTPUT_FILE", "str")
     parse_value(config_dict, "PERFECT", "bool")
     parse_value(config_dict, "PATTERN", "bool")
+    if not validate_config(config_dict):
+        exit()
     return config_dict
 
 
@@ -90,21 +92,30 @@ def validate_config(config_dict: Dict[str, Any]) -> bool:
     Returns:
         True if all parameters are valid, else False.
     """
+    invalid_list: List[str] = []
     if config_dict["WIDTH"] < 1 or config_dict["HEIGHT"] < 1:
-        return False
+        invalid_list.append("WIDTH and HEIGHT must be positive!")
     if (config_dict["ENTRY"][0] >= config_dict["WIDTH"]
             or config_dict["ENTRY"][0] < 0
             or config_dict["ENTRY"][1] >= config_dict["HEIGHT"]
             or config_dict["ENTRY"][1] < 0):
-        return False
+        invalid_list.append("ENTRY must be within boundaries!")
     if (config_dict["EXIT"][0] >= config_dict["WIDTH"]
             or config_dict["EXIT"][0] < 0
             or config_dict["EXIT"][1] >= config_dict["HEIGHT"]
             or config_dict["EXIT"][1] < 0):
-        return False
+        invalid_list.append("EXIT must be within boundaries!")
     if config_dict["ENTRY"] == config_dict["EXIT"]:
-        return False
+        invalid_list.append("EXIT must not be at the same position as ENTRY!")
     if not config_dict["OUTPUT_FILE"]:
+        invalid_list.append("OUTPUT_FILE must not be empty!")
+    if invalid_list:
+        if len(invalid_list) == 1:
+            print(f"Input validation failed: {invalid_list[0]}")
+            return False
+        print("Input validation failed:")
+        for item in invalid_list:
+            print(f"  {item}")
         return False
     return True
 
@@ -167,10 +178,10 @@ def main_loop(maze: MazeGenerator, file: str) -> None:
             maze.generate_maze()
             maze.solve()
             create_output_file(maze)
-            render_maze(maze, show_path)
+            render_maze(maze, show_path, wall_colors[0])
         elif choice == "2":
             show_path = not show_path
-            render_maze(maze, show_path)
+            render_maze(maze, show_path, wall_colors[0])
         elif choice == "3":
             wall_colors.append(wall_colors.pop(0))
             render_maze(maze, show_path, wall_colors[0])
