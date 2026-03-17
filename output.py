@@ -1,6 +1,6 @@
 """Output file module for a_maze_ing."""
 
-from maze_generator import MazeGenerator
+from mazegen import MazeGenerator
 
 
 def create_output_file(maze: MazeGenerator) -> None:
