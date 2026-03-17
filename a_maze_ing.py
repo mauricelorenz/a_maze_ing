@@ -123,9 +123,7 @@ def test_output(maze: MazeGenerator, hex: bool) -> None:
         print()
 
 
-def create_output_file(maze: MazeGenerator,
-                       config_dict: Dict[str, Any],
-                       path: List[str]) -> None:
+def create_output_file(maze: MazeGenerator) -> None:
     """Create the predefined output file from the created maze.
 
     Args:
@@ -138,14 +136,44 @@ def create_output_file(maze: MazeGenerator,
         for col in row:
             output_string += f"{col:X}"
         output_string += "\n"
-    output_string += f"\n{config_dict['ENTRY'][0]},{config_dict['ENTRY'][1]}\n"
-    output_string += f"{config_dict['EXIT'][0]},{config_dict['EXIT'][1]}\n"
-    output_string += "".join(path) + "\n"
+    output_string += f"\n{maze.config['ENTRY'][0]},{maze.config['ENTRY'][1]}\n"
+    output_string += f"{maze.config['EXIT'][0]},{maze.config['EXIT'][1]}\n"
+    output_string += "".join(maze.path) + "\n"
     try:
-        with open(config_dict["OUTPUT_FILE"], "w") as f:
+        with open(maze.config["OUTPUT_FILE"], "w") as f:
             f.write(output_string)
     except Exception as e:
-        print(f"Error while creating {config_dict['OUTPUT_FILE']}: {e}")
+        print(f"Error while creating {maze.config['OUTPUT_FILE']}: {e}")
+
+
+def main_loop(maze: MazeGenerator, file: str) -> None:
+    choice = "0"
+    show_path = False
+    wall_colors = ["\033[37m", "\033[36m", "\033[35m"]
+    while choice != "4":
+        print("\n=== A-Maze-ing ===")
+        print("1. Re-generate a new maze")
+        print("2. Show/Hide path from entry to exit")
+        print("3. Rotate maze colors")
+        print("4. Quit")
+        choice = input("Choice? (1-4): ")
+        print()
+        if choice not in ["1", "2", "3", "4"]:
+            print("Invalid choice. Try again!")
+            choice = "0"
+        elif choice == "1":
+            config_dict: Dict[str, Any] = parse_config(file)
+            maze = MazeGenerator(config_dict)
+            maze.generate_maze()
+            maze.solve()
+            create_output_file(maze)
+            render_maze(maze, show_path)
+        elif choice == "2":
+            show_path = not show_path
+            render_maze(maze, show_path)
+        elif choice == "3":
+            wall_colors.append(wall_colors.pop(0))
+            render_maze(maze, show_path, wall_colors[0])
 
 
 def main() -> None:
@@ -156,12 +184,12 @@ def main() -> None:
         print(f"Usage: python3 {argv[0]} <config file>")
         exit()
     config_dict: Dict[str, Any] = parse_config(file)
-    # print(config_dict)
     maze = MazeGenerator(config_dict)
     maze.generate_maze()
-    path: List[str] = maze.solve()
-    create_output_file(maze, config_dict, path)
-    render_maze(maze)
+    maze.solve()
+    create_output_file(maze)
+    render_maze(maze, False)
+    main_loop(maze, file)
 
 
 if __name__ == "__main__":
