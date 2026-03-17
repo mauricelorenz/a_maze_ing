@@ -74,6 +74,7 @@ class MazeGenerator:
         self._backtrack(*entry)
         if not self.config["PERFECT"]:
             self._remove_walls()
+            self._force_second_path()
         for r, row in enumerate(self.grid):
             for c, col in enumerate(row):
                 if col == -1:
@@ -189,3 +190,19 @@ class MazeGenerator:
             current = previous
         self.path.reverse()
         return self.path
+
+    def _force_second_path(self) -> None:
+        """Force a second path by opening an additional wall at entry or exit."""
+        x, y = self.config["ENTRY"]
+        dirs = [(0, -1, 1, 4), (0, 1, 4, 1), (-1, 0, 8, 2), (1, 0, 2, 8)]
+        shuffle(dirs)
+        for d in dirs:
+            nx = x + d[0]
+            ny = y + d[1]
+            if (self._is_in_bounds(nx, ny)
+                    and self.grid[ny][nx] != -1
+                    and self.grid[y][x] & d[2] != 0
+                    and not self._would_create_3x3(x, y)):
+                self.grid[y][x] &= ~d[2]
+                self.grid[ny][nx] &= ~d[3]
+                return
