@@ -36,20 +36,28 @@ def render_maze_grid(maze: MazeGenerator) -> List[List[int]]:
     return rendered_grid
 
 
-def render_entry_exit(maze: MazeGenerator,
-                      rendered_maze: List[List[int]]) -> None:
-    entry: Tuple[int, int] = maze.config["ENTRY"]
-    exit_: Tuple[int, int] = maze.config["EXIT"]
+def set_special_cell(cell_value: int, coords: Tuple[int, int],
+                     rendered_maze: List[List[int]]) -> None:
     for y in range(1, 3):
         for x in range(1, 3):
-            rendered_maze[entry[1] * 3 + y][entry[0] * 3 + x] = 2
-            rendered_maze[exit_[1] * 3 + y][exit_[0] * 3 + x] = 3
+            rendered_maze[coords[1] * 3 + y][coords[0] * 3 + x] = cell_value
+
+
+def render_special_cells(maze: MazeGenerator,
+                         rendered_maze: List[List[int]]) -> None:
+    set_special_cell(2, maze.config["ENTRY"], rendered_maze)
+    set_special_cell(3, maze.config["EXIT"], rendered_maze)
+    for r, row in enumerate(maze.grid):
+        for c, col in enumerate(row):
+            if maze.grid[r][c] == 15:
+                set_special_cell(4, (c, r), rendered_maze)
 
 
 def print_maze(rendered_maze: List[List[int]]) -> None:
     # wall = "\033[37m"
     entry = "\033[32m"
     exit_ = "\033[31m"
+    pattern = "\033[34m"
     reset = "\033[0m"
     for row in rendered_maze:
         for col in row:
@@ -59,6 +67,8 @@ def print_maze(rendered_maze: List[List[int]]) -> None:
                 print(entry + "█" + reset, end="")
             elif (col == 3):
                 print(exit_ + "█" + reset, end="")
+            elif (col == 4):
+                print(pattern + "█" + reset, end="")
             else:
                 print(" ", end="")
         print()
@@ -66,5 +76,5 @@ def print_maze(rendered_maze: List[List[int]]) -> None:
 
 def render_maze(maze: MazeGenerator) -> None:
     rendered_maze = render_maze_grid(maze)
-    render_entry_exit(maze, rendered_maze)
+    render_special_cells(maze, rendered_maze)
     print_maze(rendered_maze)
