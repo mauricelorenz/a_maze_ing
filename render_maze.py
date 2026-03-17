@@ -1,5 +1,5 @@
 from maze import MazeGenerator
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 
 def render_maze_grid(maze: MazeGenerator) -> List[List[int]]:
@@ -53,28 +53,48 @@ def render_special_cells(maze: MazeGenerator,
                 set_special_cell(4, (c, r), rendered_maze)
 
 
-def print_maze(rendered_maze: List[List[int]]) -> None:
-    # wall = "\033[37m"
+def render_path(maze: MazeGenerator, rendered_maze: List[List[int]]) -> None:
+    curr: Tuple[int, int] = maze.config["ENTRY"]
+    path: List[str] = maze.path
+    path_mapping: Dict[str, Tuple[int, int]] = {"N": (-1, 0),
+                                                "E": (0, 1),
+                                                "S": (1, 0),
+                                                "W": (0, -1)}
+    for s, step in enumerate(path):
+        if s == len(path) - 1:
+            break
+        curr = (curr[0] + path_mapping[step][1],
+                curr[1] + path_mapping[step][0])
+        set_special_cell(5, curr, rendered_maze)
+
+
+def print_maze(rendered_maze: List[List[int]], wall_color: str) -> None:
     entry = "\033[32m"
     exit_ = "\033[31m"
     pattern = "\033[34m"
+    path = "\033[33m"
     reset = "\033[0m"
     for row in rendered_maze:
         for col in row:
             if (col == 1):
-                print("█", end="")
+                print(wall_color + "█" + reset, end="")
             elif (col == 2):
                 print(entry + "█" + reset, end="")
             elif (col == 3):
                 print(exit_ + "█" + reset, end="")
             elif (col == 4):
                 print(pattern + "█" + reset, end="")
+            elif (col == 5):
+                print(path + "█" + reset, end="")
             else:
                 print(" ", end="")
         print()
 
 
-def render_maze(maze: MazeGenerator) -> None:
+def render_maze(maze: MazeGenerator, show_path: bool,
+                wall_color: str = "\033[37m") -> None:
     rendered_maze = render_maze_grid(maze)
     render_special_cells(maze, rendered_maze)
-    print_maze(rendered_maze)
+    if show_path:
+        render_path(maze, rendered_maze)
+    print_maze(rendered_maze, wall_color)
