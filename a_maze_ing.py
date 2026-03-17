@@ -5,9 +5,9 @@
 from sys import argv, exit
 from typing import Dict, Any
 from config_parser import parse_config
-from output import create_output_file
+from file_output import create_output_file
 from mazegen import MazeGenerator
-from render_maze import render_maze
+from maze_renderer import render_maze
 
 
 # Only for development. Remove before turning in
