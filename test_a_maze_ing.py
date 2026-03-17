@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from os import remove
 from pytest import raises
-from a_maze_ing import parse_config, validate_config, parse_value
+from config_parser import parse_config, validate_config, parse_value
 
 
 def test_parse_config_happy() -> None:

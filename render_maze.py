@@ -1,4 +1,4 @@
-from maze import MazeGenerator
+from maze_generator import MazeGenerator
 from typing import List, Tuple, Dict
 
 
