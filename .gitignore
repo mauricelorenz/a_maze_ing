@@ -8,3 +8,4 @@ mlx*
 render_test.py
 dist/
 mazegen.egg-info/
+maze.png
