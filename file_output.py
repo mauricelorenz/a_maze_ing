@@ -1,4 +1,4 @@
-"""Output file module for a_maze_ing."""
+"""a_maze_ing module for file output."""
 
 from mazegen import MazeGenerator
 

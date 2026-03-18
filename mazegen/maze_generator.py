@@ -122,7 +122,7 @@ class MazeGenerator:
         return True
 
     def _remove_walls(self) -> None:
-        """Removes approximately 10% of walls randomly to create loops.
+        """Remove approximately 10% of walls randomly to create loops.
 
         Skips walls that would create a 3x3 open area. Stopfs after a maximum
         number of tries to prevent an infinte loop.

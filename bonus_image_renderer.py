@@ -6,6 +6,12 @@ from mazegen import MazeGenerator
 
 
 def render_image(maze: MazeGenerator, rendered_maze: List[List[int]]) -> None:
+    """Render image representation of the maze.
+
+    Args:
+        maze: MazeGenerator instance containing the grid.
+        rendered_maze: 2D list containing the pixel representation.
+    """
     canvas_width = (len(rendered_maze[0]) + 2) * 20
     canvas_height = (len(rendered_maze) + 2) * 20
     pixel_color: Dict[int, Tuple[int, int, int]] = {1: (0, 0, 0),

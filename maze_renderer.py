@@ -1,8 +1,18 @@
+"""a_maze_ing module for maze rendering."""
+
 from mazegen import MazeGenerator
 from typing import List, Tuple, Dict
 
 
 def render_maze_grid(maze: MazeGenerator) -> List[List[int]]:
+    """Transform cell based list to pixel based list.
+
+    Args:
+        maze: MazeGenerator instance containing the grid.
+
+    Returns:
+        2D list of the maze's pixel representation.
+    """
     rendered_grid: List[List[int]] = []
     rendered_width: int = maze.width * 3 + 1
     rendered_height: int = maze.height * 3 + 1
@@ -38,6 +48,13 @@ def render_maze_grid(maze: MazeGenerator) -> List[List[int]]:
 
 def set_special_cell(cell_value: int, coords: Tuple[int, int],
                      rendered_maze: List[List[int]]) -> None:
+    """Set color for the pixel representation of passed coordinates.
+
+    Args:
+        cell_value: Color code to be set.
+        coords: Coordinates in the cell representation.
+        rendered_maze: 2D list containing the pixel representation.
+    """
     for y in range(1, 3):
         for x in range(1, 3):
             rendered_maze[coords[1] * 3 + y][coords[0] * 3 + x] = cell_value
@@ -45,6 +62,12 @@ def set_special_cell(cell_value: int, coords: Tuple[int, int],
 
 def render_special_cells(maze: MazeGenerator,
                          rendered_maze: List[List[int]]) -> None:
+    """Render entry, exit and 42 pattern if any.
+
+    Args:
+        maze: MazeGenerator instance containing the grid.
+        rendered_maze: 2D list containing the pixel representation.
+    """
     set_special_cell(2, maze.config["ENTRY"], rendered_maze)
     set_special_cell(3, maze.config["EXIT"], rendered_maze)
     for r, row in enumerate(maze.grid):
@@ -54,6 +77,12 @@ def render_special_cells(maze: MazeGenerator,
 
 
 def render_path(maze: MazeGenerator, rendered_maze: List[List[int]]) -> None:
+    """Render the solution path.
+
+    Args:
+        maze: MazeGenerator instance containing the grid.
+        rendered_maze: 2D list containing the pixel representation.
+    """
     curr: Tuple[int, int] = maze.config["ENTRY"]
     path: List[str] = maze.path
     path_mapping: Dict[str, Tuple[int, int]] = {"N": (-1, 0),
@@ -69,6 +98,12 @@ def render_path(maze: MazeGenerator, rendered_maze: List[List[int]]) -> None:
 
 
 def print_maze(rendered_maze: List[List[int]], wall_color: str) -> None:
+    """Print the rendered maze.
+
+    Args:
+        rendered_maze: 2D list containing the pixel representation.
+        wall_color: Color code of the maze's walls.
+    """
     entry = "\033[32m"
     exit_ = "\033[31m"
     pattern = "\033[34m"
@@ -93,6 +128,13 @@ def print_maze(rendered_maze: List[List[int]], wall_color: str) -> None:
 
 def render_maze(maze: MazeGenerator, show_path: bool,
                 wall_color: str = "\033[37m") -> List[List[int]]:
+    """Render the maze into a pixel representation.
+
+    Args:
+        maze: MazeGenerator instance containing the grid.
+        show_path: True if path should be rendered, else False.
+        wall_color: Color code of the maze's walls.
+    """
     rendered_maze: List[List[int]] = render_maze_grid(maze)
     render_special_cells(maze, rendered_maze)
     if show_path:

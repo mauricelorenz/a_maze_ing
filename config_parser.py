@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-
-"""Config parser module for a_maze_ing."""
+"""a_maze_ing module for parsing config file."""
 
 from sys import exit
 from typing import List, Dict, Any
