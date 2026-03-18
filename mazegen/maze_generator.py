@@ -52,12 +52,19 @@ class MazeGenerator:
         if self.width < 11 or self.height < 9:
             print("Maze too small to place 42 pattern!")
             return
-
         start_x: int = (self.width // 2) - 3
         start_y: int = (self.height // 2) - 2
         for (px, py) in FOUR:
+            if ((start_x + px, start_y + py) == self.config["ENTRY"]
+                    or (start_x + px, start_y + py) == self.config["EXIT"]):
+                print("ENTRY and EXIT must not be in 42 pattern!")
+                exit()
             self.grid[start_y + py][start_x + px] = BLOCKED
         for (px, py) in TWO:
+            if ((start_x + px, start_y + py) == self.config["ENTRY"]
+                    or (start_x + px, start_y + py) == self.config["EXIT"]):
+                print("ENTRY and EXIT must not be in 42 pattern!")
+                exit()
             self.grid[start_y + py][start_x + px + 4] = BLOCKED
 
     def generate_maze(self) -> None:
@@ -71,7 +78,11 @@ class MazeGenerator:
             seed(self.config["SEED"])
         else:
             seed()
-        self._backtrack(*entry)
+        try:
+            self._backtrack(*entry)
+        except RecursionError as e:
+            print(f"Error: {e}")
+            exit()
         if not self.config["PERFECT"]:
             self._remove_walls()
             self._force_second_path()
@@ -185,6 +196,7 @@ class MazeGenerator:
         current = exit_
         self.path = []
         while current != entry:
+
             previous, direction = came_from[current]
             self.path.append(direction)
             current = previous
