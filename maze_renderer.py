@@ -92,9 +92,10 @@ def print_maze(rendered_maze: List[List[int]], wall_color: str) -> None:
 
 
 def render_maze(maze: MazeGenerator, show_path: bool,
-                wall_color: str = "\033[37m") -> None:
-    rendered_maze = render_maze_grid(maze)
+                wall_color: str = "\033[37m") -> List[List[int]]:
+    rendered_maze: List[List[int]] = render_maze_grid(maze)
     render_special_cells(maze, rendered_maze)
     if show_path:
         render_path(maze, rendered_maze)
     print_maze(rendered_maze, wall_color)
+    return rendered_maze
