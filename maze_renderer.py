@@ -77,17 +77,17 @@ def print_maze(rendered_maze: List[List[int]], wall_color: str) -> None:
     for row in rendered_maze:
         for col in row:
             if (col == 1):
-                print(wall_color + "█" + reset, end="")
+                print(wall_color + "██" + reset, end="")
             elif (col == 2):
-                print(entry + "█" + reset, end="")
+                print(entry + "██" + reset, end="")
             elif (col == 3):
-                print(exit_ + "█" + reset, end="")
+                print(exit_ + "██" + reset, end="")
             elif (col == 4):
-                print(pattern + "█" + reset, end="")
+                print(pattern + "██" + reset, end="")
             elif (col == 5):
-                print(path + "█" + reset, end="")
+                print(path + "██" + reset, end="")
             else:
-                print(" ", end="")
+                print("  ", end="")
         print()
 
 
