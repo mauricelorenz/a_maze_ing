@@ -41,9 +41,11 @@ def main_loop(file: str) -> None:
                                                          wall_colors[0])
         elif choice == "2":
             show_path = not show_path
+            print()
             rendered_maze = render_maze(maze, show_path, wall_colors[0])
         elif choice == "3":
             wall_colors.append(wall_colors.pop(0))
+            print()
             render_maze(maze, show_path, wall_colors[0])
         elif choice == "4":
             render_image(maze, rendered_maze)
