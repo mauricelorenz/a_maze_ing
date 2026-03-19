@@ -38,9 +38,7 @@ class MazeGenerator:
             for x in range(self.width):
                 row.append(15)
             self.grid.append(row)
-        if (config_dict.get("PATTERN", False)
-                and self.width >= 11
-                and self.height >= 9):
+        if (config_dict.get("PATTERN", False)):
             self.place_pattern()
 
     def place_pattern(self) -> None:
@@ -50,7 +48,7 @@ class MazeGenerator:
         (minimum 11x9 required.)
         """
         if self.width < 11 or self.height < 9:
-            print("Maze too small to place 42 pattern!")
+            print("\nMaze too small to place 42 pattern!")
             return
         start_x: int = (self.width // 2) - 3
         start_y: int = (self.height // 2) - 2
@@ -196,7 +194,6 @@ class MazeGenerator:
         current = exit_
         self.path = []
         while current != entry:
-
             previous, direction = came_from[current]
             self.path.append(direction)
             current = previous
