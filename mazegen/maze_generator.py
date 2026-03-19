@@ -58,13 +58,13 @@ class MazeGenerator:
             if ((start_x + px, start_y + py) == self.config["ENTRY"]
                     or (start_x + px, start_y + py) == self.config["EXIT"]):
                 print("ENTRY and EXIT must not be in 42 pattern!")
-                exit()
+                exit(1)
             self.grid[start_y + py][start_x + px] = BLOCKED
         for (px, py) in TWO:
             if ((start_x + px, start_y + py) == self.config["ENTRY"]
                     or (start_x + px, start_y + py) == self.config["EXIT"]):
                 print("ENTRY and EXIT must not be in 42 pattern!")
-                exit()
+                exit(1)
             self.grid[start_y + py][start_x + px + 4] = BLOCKED
 
     def generate_maze(self) -> None:
@@ -82,7 +82,7 @@ class MazeGenerator:
             self._backtrack(*entry)
         except RecursionError as e:
             print(f"Error: {e}")
-            exit()
+            exit(1)
         if not self.config["PERFECT"]:
             self._remove_walls()
             self._force_second_path()

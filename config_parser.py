@@ -33,10 +33,10 @@ def parse_value(config_dict: Dict[str, Any],
                 raise Exception("Invalid string for bool!")
     except KeyError:
         print(f"Error while parsing {key}: missing argument")
-        exit()
+        exit(1)
     except Exception as e:
         print(f"Error while parsing {key}: {e}")
-        exit()
+        exit(1)
 
 
 def parse_config(file: str) -> Dict[str, Any]:
@@ -56,7 +56,7 @@ def parse_config(file: str) -> Dict[str, Any]:
                     config_list.append(line.strip())
     except FileNotFoundError:
         print(f"File {file} not found. Please make sure it exists!")
-        exit()
+        exit(1)
     config_dict: Dict[str, Any] = {}
     try:
         for item in config_list:
@@ -66,7 +66,7 @@ def parse_config(file: str) -> Dict[str, Any]:
             config_dict[split_item[0]] = split_item[1]
     except Exception as e:
         print(f"Error: {e}")
-        exit()
+        exit(1)
     parse_value(config_dict, "WIDTH", "int")
     parse_value(config_dict, "HEIGHT", "int")
     parse_value(config_dict, "ENTRY", "tuple")
@@ -76,7 +76,7 @@ def parse_config(file: str) -> Dict[str, Any]:
     if "PATTERN" in config_dict:
         parse_value(config_dict, "PATTERN", "bool")
     if not validate_config(config_dict):
-        exit()
+        exit(1)
     return config_dict
 
 

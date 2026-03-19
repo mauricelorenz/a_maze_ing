@@ -58,7 +58,7 @@ def main() -> None:
         file: str = argv[1]
     except IndexError:
         print(f"Usage: python3 {argv[0]} <config file>")
-        exit()
+        exit(1)
     main_loop(file)
 
 
