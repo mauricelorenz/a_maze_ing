@@ -27,7 +27,6 @@ def main_loop(file: str) -> None:
             print("4. Bonus: Show and save maze as PNG")
             print("5. Quit")
             choice = input("Choice? (1-5): ")
-            print()
         if choice not in ["1", "2", "3", "4", "5"]:
             print("Invalid choice. Try again!")
         elif choice == "1":
@@ -36,6 +35,7 @@ def main_loop(file: str) -> None:
             maze.generate_maze()
             maze.solve()
             create_output_file(maze)
+            print()
             rendered_maze: List[List[int]] = render_maze(maze,
                                                          show_path,
                                                          wall_colors[0])
