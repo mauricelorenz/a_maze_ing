@@ -15,9 +15,9 @@ def main_loop(file: str) -> None:
     Args:
         file: Name of the config file.
     """
-    choice = "1"
-    show_path = False
-    wall_colors = ["\033[37m", "\033[36m", "\033[35m"]
+    choice: str = "1"
+    show_path: bool = False
+    wall_colors: List[str] = ["\033[37m", "\033[36m", "\033[35m"]
     while True:
         if choice == "0":
             print("\n=== A-Maze-ing ===")
