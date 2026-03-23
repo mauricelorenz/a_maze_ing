@@ -29,7 +29,7 @@ class MazeGenerator:
         self.exit = exit
         self.output_file = output_file
         self.perfect = perfect
-        self.seed = seed
+        self.seed_ = seed
         self.pattern = pattern
         self.grid: List[List[int]] = []
         self.path: List[str] = []
@@ -42,34 +42,27 @@ class MazeGenerator:
             self.place_pattern()
 
     def place_pattern(self) -> None:
-        """Place the 42 pattern and set these cells as BLOCKED (-1).
+        """Place the 42 pattern and set these cells as blocked (-1).
 
         Prints an error and returns early if the maze is too small
         (minimum 11x9 required.)
         """
-        BLOCKED: int = -1
-        FOUR: List[tuple[int, int]] = [(0, 0), (0, 1), (0, 2), (1, 2),
-                                       (2, 2), (2, 3), (2, 4)]
-        TWO: List[tuple[int, int]] = [(0, 0), (1, 0), (2, 0), (2, 1),
-                                      (2, 2), (1, 2), (0, 2), (0, 3),
-                                      (0, 4), (1, 4), (2, 4)]
+        FOURTY_TWO: List[tuple[int, int]] = [(0, 0), (0, 1), (0, 2), (1, 2),
+                                             (2, 2), (2, 3), (2, 4), (0, 0),
+                                             (1, 0), (2, 0), (2, 1), (2, 2),
+                                             (1, 2), (0, 2), (0, 3), (0, 4),
+                                             (1, 4), (2, 4)]
         if self.width < 11 or self.height < 9:
             print("\nMaze too small to place 42 pattern!")
             return
         start_x: int = (self.width // 2) - 3
         start_y: int = (self.height // 2) - 2
-        for (px, py) in FOUR:
-            if ((start_x + px, start_y + py) == self.config["ENTRY"]
-                    or (start_x + px, start_y + py) == self.config["EXIT"]):
+        for (px, py) in FOURTY_TWO:
+            if ((start_x + px, start_y + py) == self.entry
+                    or (start_x + px, start_y + py) == self.exit):
                 print("ENTRY and EXIT must not be in 42 pattern!")
                 exit(1)
-            self.grid[start_y + py][start_x + px] = BLOCKED
-        for (px, py) in TWO:
-            if ((start_x + px, start_y + py) == self.config["ENTRY"]
-                    or (start_x + px, start_y + py) == self.config["EXIT"]):
-                print("ENTRY and EXIT must not be in 42 pattern!")
-                exit(1)
-            self.grid[start_y + py][start_x + px + 4] = BLOCKED
+            self.grid[start_y + py][start_x + px] = -1
 
     def generate_maze(self) -> None:
         """Use backtracking to generate a maze in the grid.
@@ -77,17 +70,18 @@ class MazeGenerator:
         Args:
             config_dict: Dict containing parsed config values.
         """
-        entry = self.config["ENTRY"]
-        if self.config.get("SEED", None):
-            seed(self.config["SEED"])
+        DIRS: Tuple[int, int, int, int] = [(0, -1, 1, 4), (0, 1, 4, 1),
+                                           (-1, 0, 8, 2), (1, 0, 2, 8)]
+        if self.seed_:
+            seed(self.seed_)
         else:
             seed()
         try:
-            self._backtrack(*entry)
+            self._backtrack(*self.entry, DIRS)
         except RecursionError as e:
             print(f"Error: {e}")
             exit(1)
-        if not self.config["PERFECT"]:
+        if not self.perfect:
             self._remove_walls()
             self._force_second_path()
         for r, row in enumerate(self.grid):
@@ -95,21 +89,21 @@ class MazeGenerator:
                 if col == -1:
                     self.grid[r][c] = 15
 
-    def _backtrack(self, x: int, y: int) -> None:
+    def _backtrack(self, x: int, y: int,
+                   DIRS: Tuple[int, int, int, int]) -> None:
         """Recursively call the backtracking algorithm to remove walls.
 
         Args:
             x: x value of the current position.
             y: y value of the current position.
         """
-        dirs = [(0, -1, 1, 4), (0, 1, 4, 1), (-1, 0, 8, 2), (1, 0, 2, 8)]
-        shuffle(dirs)
-        for dir in dirs:
+        shuffle(DIRS)
+        for dir in DIRS:
             if (self._is_in_bounds(x + dir[0], y + dir[1])
                     and self.grid[y + dir[1]][x + dir[0]] == 15):
                 self.grid[y][x] &= ~dir[2]
                 self.grid[y + dir[1]][x + dir[0]] &= ~dir[3]
-                self._backtrack(x + dir[0], y + dir[1])
+                self._backtrack(x + dir[0], y + dir[1], DIRS)
 
     def _is_in_bounds(self, x: int, y: int) -> bool:
         """Check if current position is in the grid's boundaries.
@@ -125,27 +119,38 @@ class MazeGenerator:
             return False
         return True
 
-    def _remove_walls(self) -> None:
+    def _remove_walls(self, DIRS: Tuple[int, int, int, int]) -> None:
         """Remove approximately 10% of walls randomly to create loops.
 
         Skips walls that would create a 3x3 open area. Stopfs after a maximum
         number of tries to prevent an infinte loop.
         """
-        to_remove = int(self.width * self.height * 0.1)
-        max_tries = int(self.width * self.height * 10)
-        tries: int = 0
-        while to_remove and tries < max_tries:
-            x = randint(1, self.width - 2)
-            y = randint(1, self.height - 2)
-            dirs = [(0, -1, 1, 4), (0, 1, 4, 1), (-1, 0, 8, 2), (1, 0, 2, 8)]
-            shuffle(dirs)
+        to_remove: int = int(self.width * self.height * 0.1)
+        max_tries: int = int(self.width * self.height * 10)
+        while to_remove and max_tries:
+            x: int = randint(1, self.width - 2)
+            y: int = randint(1, self.height - 2)
+            shuffle(DIRS)
             if (self.grid[y][x] != -1
-                    and self.grid[y + dirs[0][1]][x + dirs[0][0]] != -1
+                    and self.grid[y + DIRS[0][1]][x + DIRS[0][0]] != -1
                     and not self._would_create_3x3(x, y)):
-                self.grid[y][x] &= ~dirs[0][2]
-                self.grid[y + dirs[0][1]][x + dirs[0][0]] &= ~dirs[0][3]
+                self.grid[y][x] &= ~DIRS[0][2]
+                self.grid[y + DIRS[0][1]][x + DIRS[0][0]] &= ~DIRS[0][3]
                 to_remove -= 1
-            tries += 1
+            max_tries -= 1
+
+    def _force_second_path(self, DIRS: Tuple[int, int, int, int]) -> None:
+        """Force a second path by opening an additional wall at entry."""
+        x, y = self.entry
+        shuffle(DIRS)
+        for dir in DIRS:
+            if (self._is_in_bounds(x + dir[0], y + dir[1])
+                    and self.grid[y + dir[1]][x + dir[0]] != -1
+                    and self.grid[y][x] & dir[2] != 0
+                    and not self._would_create_3x3(x, y)):
+                self.grid[y][x] &= ~dir[2]
+                self.grid[y + dir[1]][x + dir[0]] &= ~dir[3]
+                return
 
     def _would_create_3x3(self, x: int, y: int) -> bool:
         """Check if removing a wall would create a 3x3 open area around (x, y).
@@ -205,19 +210,3 @@ class MazeGenerator:
             current = previous
         self.path.reverse()
         return self.path
-
-    def _force_second_path(self) -> None:
-        """Force a second path by opening an additional wall at entry."""
-        x, y = self.config["ENTRY"]
-        dirs = [(0, -1, 1, 4), (0, 1, 4, 1), (-1, 0, 8, 2), (1, 0, 2, 8)]
-        shuffle(dirs)
-        for d in dirs:
-            nx = x + d[0]
-            ny = y + d[1]
-            if (self._is_in_bounds(nx, ny)
-                    and self.grid[ny][nx] != -1
-                    and self.grid[y][x] & d[2] != 0
-                    and not self._would_create_3x3(x, y)):
-                self.grid[y][x] &= ~d[2]
-                self.grid[ny][nx] &= ~d[3]
-                return
