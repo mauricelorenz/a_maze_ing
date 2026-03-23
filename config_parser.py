@@ -100,7 +100,7 @@ def parse_config(file: str) -> Dict[str, Any]:
             split_item: List[str] = item.split("=")
             if len(split_item) != 2:
                 raise Exception("Invalid key value pairs!")
-            config_dict[split_item[0]] = split_item[1]
+            config_dict[split_item[0]] = split_item[1].strip()
     except Exception as e:
         print(f"Error: {e}")
         exit(1)
