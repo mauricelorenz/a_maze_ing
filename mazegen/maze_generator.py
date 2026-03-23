@@ -53,10 +53,10 @@ class MazeGenerator:
         (minimum 11x9 required.)
         """
         FOURTY_TWO: List[tuple[int, int]] = [(0, 0), (0, 1), (0, 2), (1, 2),
-                                             (2, 2), (2, 3), (2, 4), (0, 0),
-                                             (1, 0), (2, 0), (2, 1), (2, 2),
-                                             (1, 2), (0, 2), (0, 3), (0, 4),
-                                             (1, 4), (2, 4)]
+                                             (2, 2), (2, 3), (2, 4), (4, 0),
+                                             (5, 0), (6, 0), (6, 1), (6, 2),
+                                             (5, 2), (4, 2), (4, 3), (4, 4),
+                                             (5, 4), (6, 4)]
         if self.width < 11 or self.height < 9:
             print("\nMaze too small to place 42 pattern!")
             return
