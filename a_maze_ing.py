@@ -31,7 +31,7 @@ def main_loop(file: str) -> None:
             print("Invalid choice. Try again!")
         elif choice == "1":
             config_dict: Dict[str, Any] = parse_config(file)
-            maze: MazeGenerator = MazeGenerator(config_dict)
+            maze: MazeGenerator = MazeGenerator(**config_dict)
             maze.generate_maze()
             maze.solve()
             create_output_file(maze)
