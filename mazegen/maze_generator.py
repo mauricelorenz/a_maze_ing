@@ -8,6 +8,11 @@ from collections import deque
 class MazeGenerator:
     """Generates a maze using the backtracker algorithm."""
 
+    DIRS: List[Tuple[int, int, int, int, str]] = [(0, -1, 1, 4, "N"),
+                                                  (0, 1, 4, 1, "S"),
+                                                  (-1, 0, 8, 2, "W"),
+                                                  (1, 0, 2, 8, "E")]
+
     def __init__(self, width: int, height: int, entry: Tuple[int, int],
                  exit: Tuple[int, int], output_file: str, perfect: bool,
                  seed: str | None = None, pattern: bool = True) -> None:
@@ -70,14 +75,12 @@ class MazeGenerator:
         Args:
             config_dict: Dict containing parsed config values.
         """
-        DIRS: Tuple[int, int, int, int] = [(0, -1, 1, 4), (0, 1, 4, 1),
-                                           (-1, 0, 8, 2), (1, 0, 2, 8)]
         if self.seed_:
             seed(self.seed_)
         else:
             seed()
         try:
-            self._backtrack(*self.entry, DIRS)
+            self._backtrack(*self.entry)
         except RecursionError as e:
             print(f"Error: {e}")
             exit(1)
@@ -89,21 +92,20 @@ class MazeGenerator:
                 if col == -1:
                     self.grid[r][c] = 15
 
-    def _backtrack(self, x: int, y: int,
-                   DIRS: Tuple[int, int, int, int]) -> None:
+    def _backtrack(self, x: int, y: int) -> None:
         """Recursively call the backtracking algorithm to remove walls.
 
         Args:
             x: x value of the current position.
             y: y value of the current position.
         """
-        shuffle(DIRS)
-        for dir in DIRS:
+        shuffle(self.DIRS)
+        for dir in self.DIRS:
             if (self._is_in_bounds(x + dir[0], y + dir[1])
                     and self.grid[y + dir[1]][x + dir[0]] == 15):
                 self.grid[y][x] &= ~dir[2]
                 self.grid[y + dir[1]][x + dir[0]] &= ~dir[3]
-                self._backtrack(x + dir[0], y + dir[1], DIRS)
+                self._backtrack(x + dir[0], y + dir[1])
 
     def _is_in_bounds(self, x: int, y: int) -> bool:
         """Check if current position is in the grid's boundaries.
@@ -119,7 +121,7 @@ class MazeGenerator:
             return False
         return True
 
-    def _remove_walls(self, DIRS: Tuple[int, int, int, int]) -> None:
+    def _remove_walls(self) -> None:
         """Remove approximately 10% of walls randomly to create loops.
 
         Skips walls that would create a 3x3 open area. Stopfs after a maximum
@@ -130,20 +132,22 @@ class MazeGenerator:
         while to_remove and max_tries:
             x: int = randint(1, self.width - 2)
             y: int = randint(1, self.height - 2)
-            shuffle(DIRS)
+            shuffle(self.DIRS)
             if (self.grid[y][x] != -1
-                    and self.grid[y + DIRS[0][1]][x + DIRS[0][0]] != -1
+                    and (self.grid[y + self.DIRS[0][1]][x + self.DIRS[0][0]]
+                         != -1)
                     and not self._would_create_3x3(x, y)):
-                self.grid[y][x] &= ~DIRS[0][2]
-                self.grid[y + DIRS[0][1]][x + DIRS[0][0]] &= ~DIRS[0][3]
+                self.grid[y][x] &= ~self.DIRS[0][2]
+                self.grid[y + self.DIRS[0][1]][x + self.DIRS[0][0]] \
+                    &= ~self.DIRS[0][3]
                 to_remove -= 1
             max_tries -= 1
 
-    def _force_second_path(self, DIRS: Tuple[int, int, int, int]) -> None:
+    def _force_second_path(self) -> None:
         """Force a second path by opening an additional wall at entry."""
         x, y = self.entry
-        shuffle(DIRS)
-        for dir in DIRS:
+        shuffle(self.DIRS)
+        for dir in self.DIRS:
             if (self._is_in_bounds(x + dir[0], y + dir[1])
                     and self.grid[y + dir[1]][x + dir[0]] != -1
                     and self.grid[y][x] & dir[2] != 0
@@ -162,16 +166,11 @@ class MazeGenerator:
         Returns:
             True if a 3x3 open area exists, else False.
         """
-        for dy in range(-1, 2):
-            for dx in range(-1, 2):
-                nx = x + dx
-                ny = y + dy
-                if self._is_in_bounds(nx + 1, ny):
-                    if self.grid[ny][nx] & 2 != 0:
-                        return False
-                if self._is_in_bounds(nx, ny + 1):
-                    if self.grid[ny][nx] & 4 != 0:
-                        return False
+        for dir in self.DIRS:
+            if (self._is_in_bounds(x + dir[0] + 1, y + dir[1])
+                and (self.grid[y + dir[1]][x + dir[0]] & 2
+                     or self.grid[y + dir[1]][x + dir[0]] & 4)):
+                return False
         return True
 
     def solve(self) -> List[str]:
@@ -180,33 +179,25 @@ class MazeGenerator:
         Returns:
             List of directions as strings (N, E, S, W).
         """
-        entry = self.config["ENTRY"]
-        exit_ = self.config["EXIT"]
         queue: Deque[Tuple[int, int]] = deque()
-        queue.append(entry)
-        visited: Set[Tuple[int, int]] = {entry}
+        queue.append(self.entry)
+        visited: Set[Tuple[int, int]] = {self.entry}
         came_from: Dict[Tuple[int, int], Tuple[Tuple[int, int], str]] = {}
-        while queue:
-            current = queue.popleft()
-            if current == exit_:
+        while True:
+            curr: Tuple[int, int] = queue.popleft()
+            if curr == self.exit:
                 break
-            dirs = [(0, -1, 1, "N"), (0, 1, 4, "S"),
-                    (-1, 0, 8, "W"), (1, 0, 2, "E")]
-            for dir in dirs:
-                nx = current[0] + dir[0]
-                ny = current[1] + dir[1]
-                neighbor = (nx, ny)
-                if (self._is_in_bounds(nx, ny)
-                        and neighbor not in visited
-                        and self.grid[current[1]][current[0]] & dir[2] == 0):
-                    queue.append(neighbor)
-                    visited.add(neighbor)
-                    came_from[neighbor] = (current, dir[3])
-        current = exit_
+            for dir in self.DIRS:
+                next: Tuple[int, int] = (curr[0] + dir[0], curr[1] + dir[1])
+                if (self._is_in_bounds(*next) and next not in visited
+                        and self.grid[curr[1]][curr[0]] & dir[2] == 0):
+                    queue.append(next)
+                    visited.add(next)
+                    came_from[next] = (curr, dir[4])
         self.path = []
-        while current != entry:
-            previous, direction = came_from[current]
-            self.path.append(direction)
-            current = previous
+        while curr != self.entry:
+            prev, nesw = came_from[curr]
+            self.path.append(nesw)
+            curr = prev
         self.path.reverse()
         return self.path
