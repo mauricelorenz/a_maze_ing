@@ -14,21 +14,21 @@ def validate_config(config_dict: Dict[str, Any]) -> bool:
         True if all parameters are valid, else False.
     """
     invalid_list: List[str] = []
-    if config_dict["WIDTH"] < 1 or config_dict["HEIGHT"] < 1:
+    if config_dict["width"] < 1 or config_dict["height"] < 1:
         invalid_list.append("WIDTH and HEIGHT must be positive!")
-    if (config_dict["ENTRY"][0] >= config_dict["WIDTH"]
-            or config_dict["ENTRY"][0] < 0
-            or config_dict["ENTRY"][1] >= config_dict["HEIGHT"]
-            or config_dict["ENTRY"][1] < 0):
+    if (config_dict["entry"][0] >= config_dict["width"]
+            or config_dict["entry"][0] < 0
+            or config_dict["entry"][1] >= config_dict["height"]
+            or config_dict["entry"][1] < 0):
         invalid_list.append("ENTRY must be within boundaries!")
-    if (config_dict["EXIT"][0] >= config_dict["WIDTH"]
-            or config_dict["EXIT"][0] < 0
-            or config_dict["EXIT"][1] >= config_dict["HEIGHT"]
-            or config_dict["EXIT"][1] < 0):
+    if (config_dict["exit"][0] >= config_dict["width"]
+            or config_dict["exit"][0] < 0
+            or config_dict["exit"][1] >= config_dict["height"]
+            or config_dict["exit"][1] < 0):
         invalid_list.append("EXIT must be within boundaries!")
-    if config_dict["ENTRY"] == config_dict["EXIT"]:
+    if config_dict["entry"] == config_dict["exit"]:
         invalid_list.append("EXIT must not be at the same position as ENTRY!")
-    if not config_dict["OUTPUT_FILE"]:
+    if not config_dict["output_file"]:
         invalid_list.append("OUTPUT_FILE must not be empty!")
     if invalid_list:
         if len(invalid_list) == 1:
@@ -100,18 +100,18 @@ def parse_config(file: str) -> Dict[str, Any]:
             split_item: List[str] = item.split("=")
             if len(split_item) != 2:
                 raise Exception("Invalid key value pairs!")
-            config_dict[split_item[0]] = split_item[1].strip()
+            config_dict[split_item[0].lower()] = split_item[1].strip()
     except Exception as e:
         print(f"Error: {e}")
         exit(1)
-    parse_value(config_dict, "WIDTH", "int")
-    parse_value(config_dict, "HEIGHT", "int")
-    parse_value(config_dict, "ENTRY", "tuple")
-    parse_value(config_dict, "EXIT", "tuple")
-    parse_value(config_dict, "OUTPUT_FILE", "str")
-    parse_value(config_dict, "PERFECT", "bool")
-    if "PATTERN" in config_dict:
-        parse_value(config_dict, "PATTERN", "bool")
+    parse_value(config_dict, "width", "int")
+    parse_value(config_dict, "height", "int")
+    parse_value(config_dict, "entry", "tuple")
+    parse_value(config_dict, "exit", "tuple")
+    parse_value(config_dict, "output_file", "str")
+    parse_value(config_dict, "perfect", "bool")
+    if "pattern" in config_dict:
+        parse_value(config_dict, "pattern", "bool")
     if not validate_config(config_dict):
         exit(1)
     return config_dict
