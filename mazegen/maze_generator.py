@@ -1,21 +1,16 @@
 """a_maze_ing module for maze generation."""
 
-from typing import List, Dict, Any, Deque, Tuple, Set
+from typing import List, Dict, Deque, Tuple, Set
 from random import seed, shuffle, randint
 from collections import deque
-
-BLOCKED = -1
-FOUR: List[tuple[int, int]] = [(0, 0), (0, 1), (0, 2), (1, 2),
-                               (2, 2), (2, 3), (2, 4)]
-TWO: List[tuple[int, int]] = [(0, 0), (1, 0), (2, 0), (2, 1),
-                              (2, 2), (1, 2), (0, 2), (0, 3),
-                              (0, 4), (1, 4), (2, 4)]
 
 
 class MazeGenerator:
     """Generates a maze using the backtracker algorithm."""
 
-    def __init__(self, config_dict: Dict[str, Any]) -> None:
+    def __init__(self, width: int, height: int, entry: Tuple[int, int],
+                 exit: Tuple[int, int], output_file: str, perfect: bool,
+                 seed: str | None = None, pattern: bool = True) -> None:
         """Initialize the MazeGenerator with a given width and height.
 
         Args:
@@ -28,9 +23,14 @@ class MazeGenerator:
                   15 = all walls closed, -1 = blocked cell (42 pattern).
             config: Dict containing parsed config values.
         """
-        self.width = config_dict["WIDTH"]
-        self.height = config_dict["HEIGHT"]
-        self.config = config_dict
+        self.width = width
+        self.height = height
+        self.entry = entry
+        self.exit = exit
+        self.output_file = output_file
+        self.perfect = perfect
+        self.seed = seed
+        self.pattern = pattern
         self.grid: List[List[int]] = []
         self.path: List[str] = []
         for y in range(self.height):
@@ -38,7 +38,7 @@ class MazeGenerator:
             for x in range(self.width):
                 row.append(15)
             self.grid.append(row)
-        if (config_dict.get("PATTERN", False)):
+        if self.pattern:
             self.place_pattern()
 
     def place_pattern(self) -> None:
@@ -47,6 +47,12 @@ class MazeGenerator:
         Prints an error and returns early if the maze is too small
         (minimum 11x9 required.)
         """
+        BLOCKED: int = -1
+        FOUR: List[tuple[int, int]] = [(0, 0), (0, 1), (0, 2), (1, 2),
+                                       (2, 2), (2, 3), (2, 4)]
+        TWO: List[tuple[int, int]] = [(0, 0), (1, 0), (2, 0), (2, 1),
+                                      (2, 2), (1, 2), (0, 2), (0, 3),
+                                      (0, 4), (1, 4), (2, 4)]
         if self.width < 11 or self.height < 9:
             print("\nMaze too small to place 42 pattern!")
             return
