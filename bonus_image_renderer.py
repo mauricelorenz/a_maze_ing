@@ -28,7 +28,7 @@ def render_image(maze: MazeGenerator, rendered_maze: List[List[int]]) -> None:
             if pixel_color.get(col, None):
                 draw.rectangle([top_left, bot_right], fill=pixel_color[col])
     try:
-        img.save(f"{maze.config['OUTPUT_FILE'].removesuffix('.txt')}.png")
+        img.save(f"{maze.output_file.removesuffix('.txt')}.png")
     except Exception:
         print("Error while saving image!")
     img.show()

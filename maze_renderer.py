@@ -68,8 +68,8 @@ def render_special_cells(maze: MazeGenerator,
         maze: MazeGenerator instance containing the grid.
         rendered_maze: 2D list containing the pixel representation.
     """
-    set_special_cell(2, maze.config["ENTRY"], rendered_maze)
-    set_special_cell(3, maze.config["EXIT"], rendered_maze)
+    set_special_cell(2, maze.entry, rendered_maze)
+    set_special_cell(3, maze.exit, rendered_maze)
     for r, row in enumerate(maze.grid):
         for c, col in enumerate(row):
             if maze.grid[r][c] == 15:
@@ -83,7 +83,7 @@ def render_path(maze: MazeGenerator, rendered_maze: List[List[int]]) -> None:
         maze: MazeGenerator instance containing the grid.
         rendered_maze: 2D list containing the pixel representation.
     """
-    curr: Tuple[int, int] = maze.config["ENTRY"]
+    curr: Tuple[int, int] = maze.entry
     path: List[str] = maze.path
     path_mapping: Dict[str, Tuple[int, int]] = {"N": (-1, 0),
                                                 "E": (0, 1),
@@ -127,7 +127,7 @@ def print_maze(rendered_maze: List[List[int]], wall_color: str) -> None:
 
 
 def render_maze(maze: MazeGenerator, show_path: bool,
-                wall_color: str = "\033[37m") -> List[List[int]]:
+                wall_color: str) -> List[List[int]]:
     """Render the maze into a pixel representation.
 
     Args:
