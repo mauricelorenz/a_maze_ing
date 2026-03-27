@@ -99,8 +99,9 @@ class MazeGenerator:
             x: x value of the current position.
             y: y value of the current position.
         """
-        shuffle(self.DIRS)
-        for dir in self.DIRS:
+        dirs: List[Tuple[int, int, int, int, str]] = self.DIRS[:]
+        shuffle(dirs)
+        for dir in dirs:
             if (self._is_in_bounds(x + dir[0], y + dir[1])
                     and self.grid[y + dir[1]][x + dir[0]] == 15):
                 self.grid[y][x] &= ~dir[2]
