@@ -28,7 +28,7 @@ def main_loop(file: str) -> None:
             print("5. Quit")
             choice = input("Choice? (1-5): ")
         if choice not in ["1", "2", "3", "4", "5"]:
-            print("Invalid choice. Try again!")
+            print("\nInvalid choice. Try again!")
         elif choice == "1":
             config_dict: Dict[str, Any] = parse_config(file)
             maze: MazeGenerator = MazeGenerator(**config_dict)
@@ -61,7 +61,10 @@ def main() -> None:
     except IndexError:
         print(f"Usage: python3 {argv[0]} <config file>")
         exit(1)
-    main_loop(file)
+    try:
+        main_loop(file)
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 if __name__ == "__main__":
