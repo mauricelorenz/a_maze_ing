@@ -91,8 +91,10 @@ def parse_config(file: str) -> Dict[str, Any]:
             for line in f:
                 if not line.startswith("#") and line.strip():
                     config_list.append(line.strip())
-    except FileNotFoundError:
-        print(f"File {file} not found. Please make sure it exists!")
+    except OSError:
+        print(f"File {file} could not be opened.\n"
+              "Please make sure it exists and you have the "
+              "required permissions!")
         exit(1)
     config_dict: Dict[str, Any] = {}
     try:
