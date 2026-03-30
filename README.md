@@ -4,11 +4,7 @@
 
 ## Description
 
-A-Maze-ing is a maze generator written in Python. It generates random mazes using the
-recursive backtracker algorithm, displays them visually in the terminal, and writes the
-result to an output file. The maze can be perfect (exactly one path from entry to exit)
-or non-perfect (multiple paths). A "42" pattern is embedded in the maze as fully closed
-cells.
+A-Maze-ing is a maze generator written in Python. It generates random mazes using recursive backtracking, renders them in the terminal, and writes the result to an output file. The maze can be perfect (exactly one path from entry to exit) or non-perfect (multiple paths). By default a "42" pattern is embedded in the maze as cells with all walls intact if sufficient space is available.
 
 ## Instructions
 
@@ -33,16 +29,18 @@ Or with a custom config file:
 python3 a_maze_ing.py my_config.txt
 ```
 
-### Other commands
+### Other Commands
 ```bash
-make lint        # Run flake8 and mypy
 make debug       # Run with pdb debugger
 make clean       # Remove cache files
+make lint        # Run flake8 and mypy
+make lint-strict # Run flake8 and mypy with --strict flag
 ```
 
 ## Config File
 
 The config file uses KEY=VALUE pairs, one per line. Lines starting with `#` are comments.
+Keys are case-insensitive.
 
 | Key | Description | Required | Example |
 |-----|-------------|----------|---------|
@@ -68,10 +66,8 @@ We chose the **Recursive Backtracker** algorithm (randomized DFS). It works by:
 - Automatically guarantees full connectivity — no isolated cells
 - Always produces a perfect maze by default
 - Seed-based reproducibility is trivial to add
-- Works naturally with our hexadecimal wall representation
 
-For non-perfect mazes, ~10% of additional walls are randomly removed to create loops,
-and a second opening at the entry is guaranteed.
+For non-perfect mazes, walls near the entry cell and approximately 10% of remaining walls are randomly removed to introduce loops.
 
 ## Visual Representation
 
@@ -82,106 +78,85 @@ The maze is rendered in the terminal using Unicode block characters. Colors:
 - Blue: 42 pattern cells
 - Yellow: solution path
 
-### User interactions
+### User Interactions
 1. Re-generate a new maze
-2. Show/Hide shortest path from entry to exit
-3. Rotate wall colors
-4. Quit
+2. Show/Hide path from entry to exit
+3. Rotate maze colors
+4. Bonus: Show and save maze as PNG
+5. Quit
 
 ## Reusable Module (mazegen)
 
-The maze generation logic is available as a standalone pip-installable package.
+A Python maze generation package using recursive backtracking.
 
-### Installation
-```bash
-pip install mazegen-1.0.0-py3-none-any.whl
-```
-
-Or in development mode:
-```bash
-pip install -e .
-```
-
-### Basic Example
+### Usage
 ```python
 from mazegen import MazeGenerator
 
-config = {
-    "WIDTH": 20,
-    "HEIGHT": 15,
-    "ENTRY": (0, 0),
-    "EXIT": (19, 14),
-    "PERFECT": True,
-    "PATTERN": False
-}
+config = {"width": 20,
+          "height": 15,
+          "entry": (0, 0),
+          "exit": (19, 14),
+          "output_file": "maze.txt",
+          "perfect": True}
 
-maze = MazeGenerator(config)
+maze = MazeGenerator(**config)
 maze.generate_maze()
-path = maze.solve()
-
-print(maze.grid)   # 2D list with wall values as hex integers
-print(path)        # ['N', 'E', 'S', ...] shortest path
+maze.solve()
 ```
 
-### Custom Parameters
+### Optional Parameters
 ```python
 # With seed for reproducibility
-config["SEED"] = 42
+config["seed"] = 42
 
-# Non-perfect maze with 42 pattern
-config["PERFECT"] = False
-config["PATTERN"] = True
+# With 42 pattern (min 11x9)
+config["pattern"] = True
 ```
 
-### Accessing the maze structure
-- `maze.grid` — 2D list of integers, each cell encodes its walls as a 4-bit hex value
-- `maze.path` — list of directions (N/E/S/W) representing the shortest path
-- `maze.width` / `maze.height` — dimensions of the maze
+### Accessing the maze
+```python
+# Access the generated maze grid
+maze.grid
 
-### Building the package
-```bash
-pip install build
-python -m build
+# Access the solution
+maze.path
 ```
 
 ## Team & Project Management
 
 ### Roles
-- **lemmerli**: Config parser, maze grid structure, 42 pattern, BFS pathfinding, refactoring, package structure
-- **mauricelorenz**: Config parser, Recursive backtracker algorithm, output file generation, terminal rendering
+- **lemmerli**: Config parser, maze grid structure, 42 pattern, BFS pathfinding, package structure
+- **mlorenz**: Recursive backtracker algorithm, output file generation, terminal rendering, PNG rendering
+- **Both**: Refactoring — splitting into separate modules (config_parser, maze_renderer, file_output), migrating from config dict to individual parameters in MazeGenerator, lowercasing config keys, moving DIRS to class attribute, non-perfect maze improvements
 
 ### Planning
-We started by understanding the hex wall representation and the recursive backtracker algorithm,
-then built the config parser, maze generator, pathfinding and rendering incrementally.
-The main challenge was the non-perfect maze generation — ensuring multiple paths while
-respecting the 3x3 open area constraint required several iterations.
+We started by understanding the hex wall representation and the recursive backtracker algorithm, then built the config parser, maze generator, pathfinding and rendering incrementally. The main challenge was the non-perfect maze generation — ensuring multiple paths while respecting the 3x3 open area constraint required several iterations.
+During refactoring we cleaned up the codebase significantly — separating concerns into dedicated modules and making the MazeGenerator API cleaner and more reusable.
 
 ### What worked well
 - Splitting into separate modules made the code clean and testable
 - The recursive backtracker was straightforward to implement
 - BFS pathfinding reused the same direction logic as the generator
+- Migrating to individual parameters made MazeGenerator truly reusable
 
 ### What could be improved
-- The `MazeGenerator` class still accepts a project-specific config dict — a cleaner
-  API with individual parameters would make it more reusable
-- More test coverage for the maze generation and pathfinding
+- Additional tests for the maze generation and pathfinding
+- Rendering with a graphics library
 
 ### Tools used
-- VS Code with Python extension
-- Claude AI for guidance on algorithms, debugging and code structure
+- VSCode
+- Claude AI as per AI Usage
 - Git/GitHub for version control
 
 ## Resources
 
-- [Maze generation algorithms — Wikipedia](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
-- [Recursive Backtracking — Jamis Buck](https://weblog.jamisbuck.org/2010/12/27/maze-generation-recursive-backtracking)
-- [Maze generation visualizations](https://professor-l.github.io/mazes/)
 - [Maze Generator in Python — inventwithpython.com](https://inventwithpython.com/recursion/chapter11.html)
 
 ### AI Usage
-Claude AI was used throughout the project for:
-- Explaining algorithms (recursive backtracker, BFS, spanning trees)
-- Debugging logic errors (3x3 check, non-perfect path guarantee)
-- Code structure and refactoring advice
+In this project's implementation the use of AI was limited to:
 
-All generated suggestions were reviewed, understood and adapted before use.
+- discussing general implementation
+- minor details, like the naming of variables
+- generation of smaller code snippets
+- proofreading commit messages and this README

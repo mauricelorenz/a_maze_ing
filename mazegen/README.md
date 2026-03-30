@@ -1,58 +1,37 @@
 # mazegen
 
-A Python maze generation package using the recursive backtracker algorithm.
+A Python maze generation package using recursive backtracking.
 
-## Installation
-```bash
-pip install mazegen-1.0.0-py3-none-any.whl
-```
-
-## Basic Example
+## Usage
 ```python
 from mazegen import MazeGenerator
 
-config = {
-    "WIDTH": 20,
-    "HEIGHT": 15,
-    "ENTRY": (0, 0),
-    "EXIT": (19, 14),
-    "PERFECT": True
-}
+config = {"width": 20,
+          "height": 15,
+          "entry": (0, 0),
+          "exit": (19, 14),
+          "output_file": "maze.txt",
+          "perfect": True}
 
-maze = MazeGenerator(config)
+maze = MazeGenerator(**config)
 maze.generate_maze()
-path = maze.solve()
+maze.solve()
 ```
 
-## Custom Parameters
+## Optional Parameters
 ```python
 # With seed for reproducibility
-config["SEED"] = 42
-
-# Non-perfect maze
-config["PERFECT"] = False
+config["seed"] = 42
 
 # With 42 pattern (min 11x9)
-config["PATTERN"] = True
+config["pattern"] = True
 ```
 
 ## Accessing the maze
 ```python
-maze.grid    # 2D list of integers, walls encoded as 4-bit hex values
-maze.path    # ['N', 'E', 'S', ...] shortest path from entry to exit
-maze.width   # maze width
-maze.height  # maze height
+# Access the generated maze grid
+maze.grid
+
+# Access the solution
+maze.path
 ```
-
-## Wall encoding
-
-Each cell value is a 4-bit integer:
-
-| Bit | Wall |
-|-----|------|
-| 0 (LSB) | North |
-| 1 | East |
-| 2 | South |
-| 3 | West |
-
-`1` = wall closed, `0` = wall open. Example: `15` (binary `1111`) = all walls closed.
