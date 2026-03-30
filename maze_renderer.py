@@ -104,11 +104,11 @@ def print_maze(rendered_maze: List[List[int]], wall_color: str) -> None:
         rendered_maze: 2D list containing the pixel representation.
         wall_color: Color code of the maze's walls.
     """
-    entry = "\033[32m"
-    exit_ = "\033[31m"
-    pattern = "\033[34m"
-    path = "\033[33m"
-    reset = "\033[0m"
+    entry: str = "\033[32m"
+    exit_: str = "\033[31m"
+    pattern: str = "\033[34m"
+    path: str = "\033[33m"
+    reset: str = "\033[0m"
     for row in rendered_maze:
         for col in row:
             if (col == 1):
