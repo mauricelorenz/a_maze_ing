@@ -134,6 +134,9 @@ def render_maze(maze: MazeGenerator, show_path: bool,
         maze: MazeGenerator instance containing the grid.
         show_path: True if path should be rendered, else False.
         wall_color: Color code of the maze's walls.
+
+    Returns:
+        2D list containing the pixel representation.
     """
     rendered_maze: List[List[int]] = render_maze_grid(maze)
     render_special_cells(maze, rendered_maze)

@@ -7,9 +7,7 @@ def create_output_file(maze: MazeGenerator) -> None:
     """Create the predefined output file from the created maze.
 
     Args:
-        maze: Maze instance containing grid, entry, exit, and solution.
-        config_dict: Dict containing parsed config values.
-        path: List of directions as strings(N, E, S, W).
+        maze: Maze instance containing grid, entry, exit, and path.
     """
     output_string: str = ""
     for row in maze.grid:

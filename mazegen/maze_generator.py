@@ -20,13 +20,6 @@ class MazeGenerator:
 
         Args:
             config_dict: Dict containing parsed config values.
-                         Required keys: WIDTH, HEIGHT.
-                         Optional keys: PATTERN (bool, defaults to False).
-
-        Attributes:
-            grid: 2D list of integers representing the maze cells.
-                  15 = all walls closed, -1 = blocked cell (42 pattern).
-            config: Dict containing parsed config values.
         """
         self.width = width
         self.height = height
@@ -47,11 +40,7 @@ class MazeGenerator:
             self.place_pattern()
 
     def place_pattern(self) -> None:
-        """Place the 42 pattern and set these cells as blocked (-1).
-
-        Prints an error and returns early if the maze is too small
-        (minimum 11x9 required.)
-        """
+        """Place the 42 pattern and set these cells as blocked (-1)."""
         FOURTY_TWO: List[tuple[int, int]] = [(0, 0), (0, 1), (0, 2), (1, 2),
                                              (2, 2), (2, 3), (2, 4), (4, 0),
                                              (5, 0), (6, 0), (6, 1), (6, 2),
@@ -123,11 +112,7 @@ class MazeGenerator:
         return True
 
     def _remove_walls(self) -> None:
-        """Remove approximately 10% of walls randomly to create loops.
-
-        Skips walls that would create a 3x3 open area. Stopfs after a maximum
-        number of tries to prevent an infinte loop.
-        """
+        """Remove approximately 10% of walls randomly to create loops."""
         to_remove: int = int(self.width * self.height * 0.1)
         max_tries: int = int(self.width * self.height * 10)
         dirs: List[Tuple[int, int, int, int, str]] = self.DIRS[:]
@@ -177,7 +162,7 @@ class MazeGenerator:
         return True
 
     def solve(self) -> None:
-        """Solve the maze using BFS and return the shortest path."""
+        """Solve the maze using BFS."""
         queue: Deque[Tuple[int, int]] = deque()
         queue.append(self.entry)
         visited: Set[Tuple[int, int]] = {self.entry}
