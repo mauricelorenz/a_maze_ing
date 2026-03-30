@@ -176,12 +176,8 @@ class MazeGenerator:
                 return False
         return True
 
-    def solve(self) -> List[str]:
-        """Solve the maze using BFS and return the shortest path.
-
-        Returns:
-            List of directions as strings (N, E, S, W).
-        """
+    def solve(self) -> None:
+        """Solve the maze using BFS and return the shortest path."""
         queue: Deque[Tuple[int, int]] = deque()
         queue.append(self.entry)
         visited: Set[Tuple[int, int]] = {self.entry}
@@ -203,4 +199,3 @@ class MazeGenerator:
             self.path.append(nesw)
             curr = prev
         self.path.reverse()
-        return self.path
