@@ -130,25 +130,27 @@ class MazeGenerator:
         """
         to_remove: int = int(self.width * self.height * 0.1)
         max_tries: int = int(self.width * self.height * 10)
+        dirs: List[Tuple[int, int, int, int, str]] = self.DIRS[:]
         while to_remove and max_tries:
             x: int = randint(1, self.width - 2)
             y: int = randint(1, self.height - 2)
-            shuffle(self.DIRS)
+            shuffle(dirs)
             if (self.grid[y][x] != -1
-                    and (self.grid[y + self.DIRS[0][1]][x + self.DIRS[0][0]]
+                    and (self.grid[y + dirs[0][1]][x + dirs[0][0]]
                          != -1)
                     and not self._would_create_3x3(x, y)):
-                self.grid[y][x] &= ~self.DIRS[0][2]
-                self.grid[y + self.DIRS[0][1]][x + self.DIRS[0][0]] \
-                    &= ~self.DIRS[0][3]
+                self.grid[y][x] &= ~dirs[0][2]
+                self.grid[y + dirs[0][1]][x + dirs[0][0]] \
+                    &= ~dirs[0][3]
                 to_remove -= 1
             max_tries -= 1
 
     def _force_second_path(self) -> None:
         """Force a second path by opening an additional wall at entry."""
         x, y = self.entry
-        shuffle(self.DIRS)
-        for dir in self.DIRS:
+        dirs: List[Tuple[int, int, int, int, str]] = self.DIRS[:]
+        shuffle(dirs)
+        for dir in dirs:
             if (self._is_in_bounds(x + dir[0], y + dir[1])
                     and self.grid[y + dir[1]][x + dir[0]] != -1
                     and self.grid[y][x] & dir[2] != 0
